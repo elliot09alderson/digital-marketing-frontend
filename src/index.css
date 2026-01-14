@@ -1,0 +1,425 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Outfit', sans-serif;
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: none;
+}
+
+body {
+  @apply bg-dark-950 text-dark-100 antialiased overflow-x-hidden;
+  background: #040507;
+}
+
+/* Custom Cursor */
+.custom-cursor {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(20, 184, 166, 0.8);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor.hover {
+  width: 40px;
+  height: 40px;
+  background: rgba(20, 184, 166, 0.1);
+  border-color: rgba(20, 184, 166, 1);
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #14b8a6;
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+}
+
+/* Torch Effect */
+.torch-effect {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.25) 0%, rgba(20, 184, 166, 0.1) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 50;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080b10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #14b8a6;
+  border-radius: 3px;
+}
+
+/* Grid Background Pattern */
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(20, 184, 166, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 184, 166, 0.08) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.grid-bg-light {
+  background-image: 
+    linear-gradient(rgba(20, 184, 166, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 184, 166, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Card Styles - Premium Decorated */
+.card-premium {
+  background: linear-gradient(135deg, rgba(26, 31, 46, 0.9) 0%, rgba(13, 17, 23, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+/* Shiny top line */
+.card-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.5), transparent);
+}
+
+/* Corner decorations */
+.card-premium::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(20, 184, 166, 0.15);
+  border-radius: 4px;
+  opacity: 0.5;
+}
+
+.card-premium:hover {
+  border-color: rgba(20, 184, 166, 0.3);
+  box-shadow: 
+    0 0 60px rgba(20, 184, 166, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform: translateY(-6px);
+}
+
+/* Inner decorative elements */
+.card-decorated {
+  position: relative;
+}
+
+.card-decorated .corner-tl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-left: 1px solid rgba(20, 184, 166, 0.2);
+  border-top: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 20px 0 0 0;
+}
+
+.card-decorated .corner-br {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-right: 1px solid rgba(20, 184, 166, 0.2);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 0 0 20px 0;
+}
+
+.card-decorated .shine-line {
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+}
+
+/* Glass Stats Card */
+.glass-stats {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(13, 17, 23, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(20, 184, 166, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 40px rgba(20, 184, 166, 0.03);
+}
+
+/* Light Card Style */
+.card-light {
+  @apply bg-white border border-dark-200 rounded-2xl;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.card-light:hover {
+  @apply border-primary-400;
+  box-shadow: 0 8px 30px rgba(20, 184, 166, 0.12);
+  transform: translateY(-4px);
+}
+
+/* Section backgrounds */
+.section-dark {
+  background: #040507;
+}
+
+.section-light {
+  @apply bg-dark-50;
+}
+
+/* Rotated Background Image Section */
+.section-with-bg-image {
+  position: relative;
+  overflow: hidden;
+  background: #040507;
+}
+
+.section-with-bg-image::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  background-image: url('/bg-1.jpeg');
+  background-size: cover;
+  background-position: center;
+  transform: rotate(-8deg);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.section-with-bg-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(4, 5, 7, 0.5) 0%, rgba(4, 5, 7, 0.3) 50%, rgba(4, 5, 7, 0.5) 100%);
+  z-index: 1;
+}
+
+/* Water Glassmorphism Card */
+.card-water-glass {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(45, 212, 191, 0.08) 50%, rgba(20, 184, 166, 0.12) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  box-shadow: 
+    0 8px 32px rgba(20, 184, 166, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 20px rgba(20, 184, 166, 0.05);
+}
+
+.card-water-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.6), transparent);
+}
+
+.card-water-glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.6s ease;
+}
+
+.card-water-glass:hover::after {
+  left: 100%;
+}
+
+.card-water-glass:hover {
+  border-color: rgba(45, 212, 191, 0.4);
+  box-shadow: 
+    0 16px 48px rgba(20, 184, 166, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 0 30px rgba(20, 184, 166, 0.08);
+  transform: translateY(-6px);
+}
+
+/* Text Gradient */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-300;
+}
+
+/* Rolling Button Styles - Clean Version */
+.btn-rolling {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  border-radius: 12px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: transform 0.3s ease;
+}
+
+.btn-rolling:hover {
+  transform: translateY(-2px);
+}
+
+.btn-rolling .btn-text-wrapper {
+  display: block;
+  position: relative;
+}
+
+.btn-rolling .btn-text,
+.btn-rolling .btn-text-hover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 32px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-rolling .btn-text {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.btn-rolling .btn-text-hover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
+}
+
+.btn-rolling:hover .btn-text {
+  transform: translateY(-100%);
+}
+
+.btn-rolling:hover .btn-text-hover {
+  transform: translateY(-100%);
+}
+
+/* Button Primary (non-glowing) */
+.btn-primary {
+  @apply px-8 py-4 rounded-xl font-semibold text-white transition-all duration-300 overflow-hidden;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  position: relative;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+/* Section with light background image */
+.section-light-bg {
+  position: relative;
+  background: #f8fafc;
+}
+
+.section-light-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/light-bg.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* Floating Animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(-20px); }
+  50% { transform: translateY(0px); }
+}
+
+.float { animation: float 6s ease-in-out infinite; }
+.float-slow { animation: float 8s ease-in-out infinite; }
+.float-reverse { animation: floatReverse 7s ease-in-out infinite; }
+.float-delay { animation: float 7s ease-in-out 2s infinite; }
+
+/* Orbiting elements */
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+
+.orbit { animation: orbit 25s linear infinite; }
+.orbit-reverse { animation: orbit 30s linear infinite reverse; }
+
+/* Glow pulse */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
+
+/* Shiny moving line */
+@keyframes shineLine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shine-animate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.1), transparent);
+  animation: shineLine 3s ease-in-out infinite;
+}

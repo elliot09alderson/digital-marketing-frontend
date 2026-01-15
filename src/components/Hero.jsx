@@ -85,11 +85,11 @@ const Hero = () => {
           <a href="#register" className="btn-rolling inline-block">
             <div className="btn-text-wrapper">
               <span className="btn-text">
-                Reserve Your Seat
+                Free Registration
                 <FiArrowRight />
               </span>
               <span className="btn-text-hover">
-                Reserve Your Seat
+                Free Registration
                 <FiArrowRight />
               </span>
             </div>

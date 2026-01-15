@@ -52,6 +52,20 @@ const testimonials = [
     quote: 'This course took my consulting business to the next level. The practical approach and lifetime support made all the difference.',
     rating: 5,
   },
+  {
+    name: 'Swati Dwivedi',
+    profession: 'Fashion Designer',
+    image: '/testimonials/swati-dwivedi.jpeg',
+    quote: 'As a fashion designer, digital marketing was the missing piece for my brand. This training helped me showcase my designs to the world and attract clients globally!',
+    rating: 5,
+  },
+  {
+    name: 'Atul Mohite',
+    profession: 'Student, IIT Kanpur',
+    image: '/testimonials/atul-mohite.jpeg',
+    quote: 'Being an engineering student, I wanted to learn something beyond academics. This program gave me practical skills to start earning while still in college!',
+    rating: 5,
+  },
 ];
 
 const Testimonials = () => {

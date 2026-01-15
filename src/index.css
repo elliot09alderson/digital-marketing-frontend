@@ -16,6 +16,30 @@
   cursor: none;
 }
 
+/* Restore default cursor on admin pages */
+.admin-page,
+.admin-page * {
+  cursor: auto !important;
+}
+
+.admin-page input,
+.admin-page select,
+.admin-page textarea {
+  cursor: text !important;
+}
+
+.admin-page button,
+.admin-page a,
+.admin-page [role="button"],
+.admin-page label {
+  cursor: pointer !important;
+}
+
+.admin-page input[type="checkbox"],
+.admin-page input[type="radio"] {
+  cursor: pointer !important;
+}
+
 body {
   @apply bg-dark-950 text-dark-100 antialiased overflow-x-hidden;
   background: #040507;

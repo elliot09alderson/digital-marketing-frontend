@@ -40,7 +40,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-dark-950 flex items-center justify-center px-4 py-8 overflow-x-hidden">
+    <div className="min-h-screen w-full bg-dark-950 flex items-center justify-center px-4 py-8 overflow-x-hidden admin-page">
       {/* Background effects */}
       <div className="fixed top-1/4 left-1/4 w-[300px] h-[300px] bg-primary-500/20 rounded-full blur-[150px] pointer-events-none" />
       <div className="fixed bottom-1/4 right-1/4 w-[200px] h-[200px] bg-primary-600/15 rounded-full blur-[120px] pointer-events-none" />

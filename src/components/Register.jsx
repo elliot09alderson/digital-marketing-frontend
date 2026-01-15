@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiPhone, FiMail, FiSend, FiMapPin, FiBriefcase, FiChevronDown } from 'react-icons/fi';
 import { BsCheck2 } from 'react-icons/bs';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { API_URL } from '../config/api';
 
 const countries = [
-  'India', 'United States', 'United Kingdom', 'Canada', 'Australia', 
+  'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
   'Germany', 'France', 'UAE', 'Singapore', 'Other'
 ];
 
@@ -23,71 +25,95 @@ const cities = {
 };
 
 const professions = [
-  'Student', 'Fresher', 'Working Professional', 'Business Owner', 
+  'Student', 'Fresher', 'Working Professional', 'Business Owner',
   'Freelancer', 'Content Creator', 'Entrepreneur', 'Homemaker', 'Other'
 ];
 
+// Validation Schema
+const validationSchema = Yup.object({
+  name: Yup.string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must be less than 50 characters')
+    .matches(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces')
+    .required('Full name is required'),
+  phone: Yup.string()
+    .matches(/^[0-9+\-\s()]+$/, 'Please enter a valid phone number')
+    .min(10, 'Phone number must be at least 10 digits')
+    .max(15, 'Phone number must be less than 15 digits')
+    .required('Phone number is required'),
+  country: Yup.string()
+    .required('Please select a country'),
+  city: Yup.string()
+    .required('Please select a city'),
+  profession: Yup.string()
+    .required('Please select your profession'),
+  email: Yup.string()
+    .email('Please enter a valid email address')
+});
 
 const Register = () => {
-  const [formData, setFormData] = useState({ 
-    name: '', 
-    phone: '', 
-    email: '',
-    country: '',
-    city: '',
-    profession: ''
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    
-    // Reset city when country changes
-    if (name === 'country') {
-      setFormData(prev => ({ ...prev, country: value, city: '' }));
-    }
-  };
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      phone: '',
+      email: '',
+      country: '',
+      city: '',
+      profession: ''
+    },
+    validationSchema,
+    onSubmit: async (values, { resetForm }) => {
+      setIsSubmitting(true);
+      setSubmitStatus({ type: '', message: '' });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus({ type: '', message: '' });
+      try {
+        const response = await fetch(`${API_URL}/registrations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values)
+        });
 
-    try {
-      const response = await fetch(`${API_URL}/registrations`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+        const data = await response.json();
 
-      const data = await response.json();
-
-      if (data.success) {
-        setSubmitStatus({ type: 'success', message: '🎉 Registration successful! We will contact you soon.' });
-        setFormData({ name: '', phone: '', email: '', country: '', city: '', profession: '' });
-      } else {
-        setSubmitStatus({ type: 'error', message: data.message || 'Registration failed. Please try again.' });
+        if (data.success) {
+          setSubmitStatus({ type: 'success', message: '🎉 Registration successful! We will contact you soon.' });
+          resetForm();
+        } else {
+          setSubmitStatus({ type: 'error', message: data.message || 'Registration failed. Please try again.' });
+        }
+      } catch (error) {
+        setSubmitStatus({ type: 'error', message: 'Server error. Please try again later.' });
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (error) {
-      setSubmitStatus({ type: 'error', message: 'Server error. Please try again later.' });
-    } finally {
-      setIsSubmitting(false);
     }
+  });
+
+  // Reset city when country changes
+  const handleCountryChange = (e) => {
+    formik.setFieldValue('country', e.target.value);
+    formik.setFieldValue('city', '');
   };
 
-  const availableCities = formData.country ? cities[formData.country] || ['Other'] : [];
+  const availableCities = formik.values.country ? cities[formik.values.country] || ['Other'] : [];
+
+  // Helper to show error
+  const getFieldError = (fieldName) => {
+    return formik.touched[fieldName] && formik.errors[fieldName] ? formik.errors[fieldName] : null;
+  };
 
   return (
     <section id="register" className="relative py-24 px-4 min-h-[800px] flex items-center justify-center overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 w-full h-full z-0">
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
           className="w-full h-full object-cover"
         >
           <source src="/form-bg.mp4" type="video/mp4" />
@@ -104,7 +130,7 @@ const Register = () => {
 
       <div className="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Left - Text */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
@@ -125,7 +151,7 @@ const Register = () => {
               Register now to secure your spot.
             </span>
           </p>
-          
+
           {/* Social Proof */}
           <div className="flex items-center gap-4 pt-4">
             <div className="flex -space-x-2">
@@ -169,7 +195,7 @@ const Register = () => {
           <div className="card-water-glass p-8">
             {/* Top glow line */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-primary-400/50 to-transparent" />
-            
+
             {/* Form Header */}
             <div className="text-center mb-6 relative z-10">
               <div className="w-14 h-14 rounded-xl bg-primary-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/30">
@@ -182,8 +208,8 @@ const Register = () => {
             {/* Submit Status Message */}
             {submitStatus.message && (
               <div className={`mb-4 p-3 rounded-xl text-center text-sm ${
-                submitStatus.type === 'success' 
-                  ? 'bg-green-500/20 border border-green-500/30 text-green-400' 
+                submitStatus.type === 'success'
+                  ? 'bg-green-500/20 border border-green-500/30 text-green-400'
                   : 'bg-red-500/20 border border-red-500/30 text-red-400'
               }`}>
                 {submitStatus.message}
@@ -191,33 +217,43 @@ const Register = () => {
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+            <form onSubmit={formik.handleSubmit} className="space-y-4 relative z-10">
               {/* Name - Full Width */}
               <div className="relative group">
                 <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="name"
-                  value={formData.name}
-                  onChange={handleChange}
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   placeholder="Full Name"
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border border-dark-600/50 text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300"
-                  required
+                  className={`w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 ${
+                    getFieldError('name') ? 'border-red-500/50' : 'border-dark-600/50'
+                  }`}
                 />
+                {getFieldError('name') && (
+                  <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('name')}</p>
+                )}
               </div>
 
               {/* Phone - Full Width */}
               <div className="relative group">
                 <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors" />
-                <input 
-                  type="tel" 
+                <input
+                  type="tel"
                   name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
+                  value={formik.values.phone}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   placeholder="Phone Number"
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border border-dark-600/50 text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300"
-                  required
+                  className={`w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 ${
+                    getFieldError('phone') ? 'border-red-500/50' : 'border-dark-600/50'
+                  }`}
                 />
+                {getFieldError('phone') && (
+                  <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('phone')}</p>
+                )}
               </div>
 
               {/* Country & City - Two in one row */}
@@ -226,37 +262,47 @@ const Register = () => {
                 <div className="relative group">
                   <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors pointer-events-none" />
                   <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-500 text-sm pointer-events-none" />
-                  <select 
+                  <select
                     name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border border-dark-600/50 text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer"
-                    required
+                    value={formik.values.country}
+                    onChange={handleCountryChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer ${
+                      getFieldError('country') ? 'border-red-500/50' : 'border-dark-600/50'
+                    }`}
                   >
                     <option value="" disabled className="bg-dark-800">Country</option>
                     {countries.map((country) => (
                       <option key={country} value={country} className="bg-dark-800">{country}</option>
                     ))}
                   </select>
+                  {getFieldError('country') && (
+                    <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('country')}</p>
+                  )}
                 </div>
 
                 {/* City Dropdown */}
                 <div className="relative group">
                   <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors pointer-events-none" />
                   <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-500 text-sm pointer-events-none" />
-                  <select 
+                  <select
                     name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border border-dark-600/50 text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer disabled:opacity-50"
-                    required
-                    disabled={!formData.country}
+                    value={formik.values.city}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer disabled:opacity-50 ${
+                      getFieldError('city') ? 'border-red-500/50' : 'border-dark-600/50'
+                    }`}
+                    disabled={!formik.values.country}
                   >
                     <option value="" disabled className="bg-dark-800">City</option>
                     {availableCities.map((city) => (
                       <option key={city} value={city} className="bg-dark-800">{city}</option>
                     ))}
                   </select>
+                  {getFieldError('city') && (
+                    <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('city')}</p>
+                  )}
                 </div>
               </div>
 
@@ -264,31 +310,42 @@ const Register = () => {
               <div className="relative group">
                 <FiBriefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors pointer-events-none" />
                 <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-500 text-sm pointer-events-none" />
-                <select 
+                <select
                   name="profession"
-                  value={formData.profession}
-                  onChange={handleChange}
-                  className="w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border border-dark-600/50 text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer"
-                  required
+                  value={formik.values.profession}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer ${
+                    getFieldError('profession') ? 'border-red-500/50' : 'border-dark-600/50'
+                  }`}
                 >
                   <option value="" disabled className="bg-dark-800">Your Profession</option>
                   {professions.map((profession) => (
                     <option key={profession} value={profession} className="bg-dark-800">{profession}</option>
                   ))}
                 </select>
+                {getFieldError('profession') && (
+                  <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('profession')}</p>
+                )}
               </div>
 
               {/* Email - Optional */}
               <div className="relative group">
                 <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors" />
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   placeholder="Email Address (Optional)"
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border border-dark-600/50 text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300"
+                  className={`w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 ${
+                    getFieldError('email') ? 'border-red-500/50' : 'border-dark-600/50'
+                  }`}
                 />
+                {getFieldError('email') && (
+                  <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('email')}</p>
+                )}
               </div>
 
               {/* Submit - Rolling Button */}
@@ -315,7 +372,7 @@ const Register = () => {
                   </div>
                 )}
               </button>
-              
+
               <p className="text-center text-dark-500 text-xs">
                 🔒 Your information is secure
               </p>

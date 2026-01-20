@@ -43,10 +43,37 @@ const validationSchema = Yup.object({
     .required('Phone number is required'),
   country: Yup.string()
     .required('Please select a country'),
+  otherCountry: Yup.string()
+    .when('country', {
+      is: 'Other',
+      then: (schema) => schema
+        .min(2, 'Country name must be at least 2 characters')
+        .max(50, 'Country name must be less than 50 characters')
+        .required('Please enter your country name'),
+      otherwise: (schema) => schema
+    }),
   city: Yup.string()
     .required('Please select a city'),
+  otherCity: Yup.string()
+    .when('city', {
+      is: 'Other',
+      then: (schema) => schema
+        .min(2, 'City name must be at least 2 characters')
+        .max(50, 'City name must be less than 50 characters')
+        .required('Please enter your city name'),
+      otherwise: (schema) => schema
+    }),
   profession: Yup.string()
     .required('Please select your profession'),
+  otherProfession: Yup.string()
+    .when('profession', {
+      is: 'Other',
+      then: (schema) => schema
+        .min(2, 'Profession must be at least 2 characters')
+        .max(50, 'Profession must be less than 50 characters')
+        .required('Please enter your profession'),
+      otherwise: (schema) => schema
+    }),
   email: Yup.string()
     .email('Please enter a valid email address')
 });
@@ -61,19 +88,34 @@ const Register = () => {
       phone: '',
       email: '',
       country: '',
+      otherCountry: '',
       city: '',
-      profession: ''
+      otherCity: '',
+      profession: '',
+      otherProfession: ''
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
       setIsSubmitting(true);
       setSubmitStatus({ type: '', message: '' });
 
+      // Prepare submission values with "Other" replacements
+      const submissionValues = {
+        ...values,
+        country: values.country === 'Other' ? values.otherCountry : values.country,
+        city: values.city === 'Other' ? values.otherCity : values.city,
+        profession: values.profession === 'Other' ? values.otherProfession : values.profession
+      };
+      // Remove the helper fields
+      delete submissionValues.otherCountry;
+      delete submissionValues.otherCity;
+      delete submissionValues.otherProfession;
+
       try {
         const response = await fetch(`${API_URL}/registrations`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values)
+          body: JSON.stringify(submissionValues)
         });
 
         const data = await response.json();
@@ -95,7 +137,27 @@ const Register = () => {
   // Reset city when country changes
   const handleCountryChange = (e) => {
     formik.setFieldValue('country', e.target.value);
+    if (e.target.value !== 'Other') {
+      formik.setFieldValue('otherCountry', '');
+    }
     formik.setFieldValue('city', '');
+    formik.setFieldValue('otherCity', '');
+  };
+
+  // Handle city change - reset otherCity if not "Other"
+  const handleCityChange = (e) => {
+    formik.setFieldValue('city', e.target.value);
+    if (e.target.value !== 'Other') {
+      formik.setFieldValue('otherCity', '');
+    }
+  };
+
+  // Handle profession change - reset otherProfession if not "Other"
+  const handleProfessionChange = (e) => {
+    formik.setFieldValue('profession', e.target.value);
+    if (e.target.value !== 'Other') {
+      formik.setFieldValue('otherProfession', '');
+    }
   };
 
   const availableCities = formik.values.country ? cities[formik.values.country] || ['Other'] : [];
@@ -281,6 +343,32 @@ const Register = () => {
                   )}
                 </div>
 
+                {/* Other Country Input - Shows when "Other" is selected */}
+                {formik.values.country === 'Other' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="relative group col-span-2"
+                  >
+                    <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors" />
+                    <input
+                      type="text"
+                      name="otherCountry"
+                      value={formik.values.otherCountry}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      placeholder="Enter your country name"
+                      className={`w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 ${
+                        getFieldError('otherCountry') ? 'border-red-500/50' : 'border-dark-600/50'
+                      }`}
+                    />
+                    {getFieldError('otherCountry') && (
+                      <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('otherCountry')}</p>
+                    )}
+                  </motion.div>
+                )}
+
                 {/* City Dropdown */}
                 <div className="relative group">
                   <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors pointer-events-none" />
@@ -288,7 +376,7 @@ const Register = () => {
                   <select
                     name="city"
                     value={formik.values.city}
-                    onChange={formik.handleChange}
+                    onChange={handleCityChange}
                     onBlur={formik.handleBlur}
                     className={`w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer disabled:opacity-50 ${
                       getFieldError('city') ? 'border-red-500/50' : 'border-dark-600/50'
@@ -306,6 +394,32 @@ const Register = () => {
                 </div>
               </div>
 
+              {/* Other City Input - Shows when "Other" is selected */}
+              {formik.values.city === 'Other' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="relative group"
+                >
+                  <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors" />
+                  <input
+                    type="text"
+                    name="otherCity"
+                    value={formik.values.otherCity}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder="Enter your city name"
+                    className={`w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 ${
+                      getFieldError('otherCity') ? 'border-red-500/50' : 'border-dark-600/50'
+                    }`}
+                  />
+                  {getFieldError('otherCity') && (
+                    <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('otherCity')}</p>
+                  )}
+                </motion.div>
+              )}
+
               {/* Profession - Full Width */}
               <div className="relative group">
                 <FiBriefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors pointer-events-none" />
@@ -313,7 +427,7 @@ const Register = () => {
                 <select
                   name="profession"
                   value={formik.values.profession}
-                  onChange={formik.handleChange}
+                  onChange={handleProfessionChange}
                   onBlur={formik.handleBlur}
                   className={`w-full pl-12 pr-8 py-3.5 rounded-xl bg-dark-800/50 border text-white appearance-none focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 cursor-pointer ${
                     getFieldError('profession') ? 'border-red-500/50' : 'border-dark-600/50'
@@ -328,6 +442,32 @@ const Register = () => {
                   <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('profession')}</p>
                 )}
               </div>
+
+              {/* Other Profession Input - Shows when "Other" is selected */}
+              {formik.values.profession === 'Other' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="relative group"
+                >
+                  <FiBriefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-dark-500 text-lg group-focus-within:text-primary-400 transition-colors" />
+                  <input
+                    type="text"
+                    name="otherProfession"
+                    value={formik.values.otherProfession}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder="Enter your profession"
+                    className={`w-full pl-12 pr-4 py-3.5 rounded-xl bg-dark-800/50 border text-white placeholder-dark-500 focus:outline-none focus:border-primary-500/50 focus:bg-dark-800/80 transition-all duration-300 ${
+                      getFieldError('otherProfession') ? 'border-red-500/50' : 'border-dark-600/50'
+                    }`}
+                  />
+                  {getFieldError('otherProfession') && (
+                    <p className="text-red-400 text-xs mt-1 pl-1">{getFieldError('otherProfession')}</p>
+                  )}
+                </motion.div>
+              )}
 
               {/* Email - Optional */}
               <div className="relative group">
